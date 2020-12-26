@@ -1,6 +1,6 @@
 let mongoose = require('mongoose')
 
-let colleges = new mongoose.Schema({
+let college = new mongoose.Schema({
   "College Name":String, 
   "Genders Accepted":String,
   "Campus Size":String, 
@@ -18,4 +18,4 @@ let colleges = new mongoose.Schema({
   "Average Fees":Number
 })
 
-module.exports = mongoose.model('Colleges', colleges)
+module.exports = mongoose.model('colleges', college)

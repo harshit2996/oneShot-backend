@@ -13,6 +13,33 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
 
+
+const findStates = () =>{
+  return college.distinct('State').exec()
+}
+
+const returnSet = async(state) => {
+  let newset =   await(college.distinct("_id",{"State": state}))
+  let l = newset.length
+  return l
+}  
+
+
+
+const mainFunction = async() => {
+  let result = []
+  let States =  await findStates()
+  for(state of States){
+    result.push({name:state,value: await returnSet(state)})
+  }
+  // collegesByState =  result
+  console.log(result)
+  return result
+}
+
+let collegesByState = mainFunction()
+
+
 app.get('/', (req, res) => {
   college
   .find({
@@ -23,6 +50,13 @@ app.get('/', (req, res) => {
   .catch(err => {
     console.error(err)
     res.send('err')
+  })
+})
+
+app.get('/collegesByStates', (req, res) => {
+  collegesByState.then(resolveData => {
+    result = resolveData
+    res.send(result)
   })
 })
 
@@ -56,6 +90,23 @@ app.post('/', (req, res) => {
   
   
   res.send({message:'success'})
+})
+
+app.post('/getCollegeDetails',(req,res)=>{
+  collegeKey = (Object.keys(req.body)[0])
+  console.log(collegeKey)
+  college.find({
+     "College Name":collegeKey   
+  })
+  .then(doc=>{
+    console.log(doc)
+    res.send(doc)
+  })
+  .catch(err=>{
+    console.log(err)
+    res.send(err)
+  })
+
 })
 
 
