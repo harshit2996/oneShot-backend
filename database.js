@@ -1,7 +1,8 @@
 let mongoose = require('mongoose');
+require('dotenv').config();
 
-const server = '127.0.0.1:27017'; // REPLACE WITH YOUR DB SERVER
-const database = 'colleges';      // REPLACE WITH YOUR DB NAME
+const server = process.env.DATABASE_SERVER; // REPLACE WITH YOUR DB SERVER
+const database = process.env.DATABASE_NAME;      // REPLACE WITH YOUR DB NAME
 
 class Database {
   constructor() {

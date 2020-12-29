@@ -6,13 +6,12 @@ const app = express()
 const port = 3000
 const bodyParser = require('body-parser')
 const college = require('./models/colleges')
-
+const student = require('./models/students')
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
-
 
 const findStates = () =>{
   return college.distinct('State').exec()
@@ -24,8 +23,6 @@ const returnSet = async(state) => {
   return l
 }  
 
-
-
 const mainFunction = async() => {
   let result = []
   let States =  await findStates()
@@ -33,63 +30,39 @@ const mainFunction = async() => {
     result.push({name:state,value: await returnSet(state)})
   }
   // collegesByState =  result
-  console.log(result)
+  // console.log(result)
   return result
 }
 
 let collegesByState = mainFunction()
 
-
-app.get('/', (req, res) => {
-  college
-  .find({
-  })
-  .then(doc => {
+app.get('/collegesByStates', (req, res) => {
+  collegesByState.then(doc => {
     res.send(doc)
   })
-  .catch(err => {
-    console.error(err)
-    res.send('err')
+})
+
+app.post('/collegesByStates', (req, res) => {
+  let StateName = (Object.keys(req.body)[0])
+  college.find({"State": StateName})
+  .then(doc=>{
+    res.send(doc)
+  })
+  .catch(err=>{
+    console.log(err)
   })
 })
 
-app.get('/collegesByStates', (req, res) => {
-  collegesByState.then(resolveData => {
-    result = resolveData
-    res.send(result)
-  })
+app.post('/college', (req, res)=>{
+  college.insertMany(req.body)
+  .then(res.send({message:'success'}))
+  .catch(err=>res.send({message:err}))
 })
 
-app.post('/', (req, res) => {
-  let coll = req.body
-  let newCollege = new college({
-    "College Name":coll["College Name"], 
-    "Genders Accepted":coll["Genders Accepted"],
-    "Campus Size":coll["Campus Size"], 
-    "Total Student Enrollments": coll["Total Student Enrollments"], 
-    "Total Faculty": coll["Total Faculty"], 
-    "Established Year":coll["Established Year"], 
-    "Rating": coll["Rating"], 
-    "University": coll["University"], 
-    "Courses":coll["Courses"], 
-    "Facilities":coll["Facilities"], 
-    "City":coll["City"], 
-    "State":coll["State"], 
-    "Country":coll["Country"],
-    "College Type":coll["College Type"], 
-    "Average Fees": coll["Average Fees"]
-  })
-  newCollege.save()
-  .then(doc => {
-    console.log(doc)
-  })
-  .catch(err => {
-    console.error(err)
-  })
-  
-  
-  
-  res.send({message:'success'})
+app.post('/student', (req, res)=>{
+  student.insertMany(req.body)
+  .then(res.send({message:'success'}))
+  .catch(err=>res.send({message:err}))
 })
 
 app.post('/getCollegeDetails',(req,res)=>{
@@ -109,7 +82,14 @@ app.post('/getCollegeDetails',(req,res)=>{
 
 })
 
-
+app.get('/getAllStudents', (req, res)=>{
+  student.find({}).then(doc=>{
+    res.send(doc)
+  })
+  .catch(err=>{
+    res.send(err)
+  })
+})
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`)
